@@ -85,6 +85,7 @@ func (c *Coordinator) AssignJob(args *JobArgs, reply *JobReply) error {
 		return nil
 	}
 
+	reduceFinished := true
 	for i, status := range c.ReduceStatus {
 		if status == 0 {
 			reply.JobType = 2
@@ -94,9 +95,16 @@ func (c *Coordinator) AssignJob(args *JobArgs, reply *JobReply) error {
 			c.ReduceStartTime[i] = time.Now().UnixMilli()
 			// fmt.Printf("Assign Reduce Job %d to worker\n", reply.ReduceId)
 			return nil
+		} else if status == 1 {
+			reduceFinished = false
 		}
 	}
+
 	// fmt.Println("All Reduce tasks assigned")
+
+	reply.JobType = 0
+	reply.Complete = reduceFinished
+
 	return nil
 }
 
@@ -141,14 +149,14 @@ func (c *Coordinator) CheckTimeOut() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for i, status := range c.MapStatus {
-		if status == 1 && time.Now().UnixMilli()-c.MapStartTime[i] >= 1000 {
+		if status == 1 && time.Now().UnixMilli()-c.MapStartTime[i] >= 10000 {
 			c.MapStatus[i] = 0
 			c.MapStartTime[i] = -1
 		}
 	}
 
 	for i, status := range c.ReduceStatus {
-		if status == 1 && time.Now().UnixMilli()-c.ReduceStartTime[i] >= 1000 {
+		if status == 1 && time.Now().UnixMilli()-c.ReduceStartTime[i] >= 10000 {
 			c.ReduceStatus[i] = 0
 			c.ReduceStartTime[i] = -1
 		}

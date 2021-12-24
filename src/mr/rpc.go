@@ -18,6 +18,7 @@ type JobReply struct {
 	MapId    int
 	ReduceId int
 	NReduce  int
+	Complete bool
 }
 
 type StatusArgs struct {

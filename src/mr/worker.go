@@ -176,9 +176,11 @@ func Worker(mapf func(string, string) []KeyValue,
 	for {
 		// fmt.Println("Getting Job from coordinator...")
 		status, reply := GetJob()
-		if !status || reply.JobType == 0 {
+		if status && reply.Complete {
+			return
+		} else if !status || reply.JobType == 0 {
 			// fmt.Println("No jobs available, sleeping")
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			continue
 		} else if reply.JobType == 1 {
 			// fmt.Printf("Working on Map Job %d: %s\n", reply.MapId, reply.Filename)
