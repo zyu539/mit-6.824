@@ -9,6 +9,9 @@ Implement MapReduce mechanism on based on RPC call & Distributed Systems
 ### Lab2A: Leader Election
 Implement Raft leader election and heartbeats (AppendEntries RPCs with no log entries)
 
-### Lab2B: Logs Append
+### Lab2B: Logs Replication
 Implement Raft logs append & replications
+
+### Lab2C: Logs Persist
+Implement Raft logs persist to state machine & ability to recover from crash
 
