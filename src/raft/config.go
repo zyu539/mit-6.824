@@ -173,6 +173,7 @@ func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 			}
 		}
 	}
+	fmt.Printf("Applied\n")
 }
 
 const SnapShotInterval = 10
@@ -186,11 +187,13 @@ func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
 			cfg.mu.Lock()
 			if cfg.rafts[i].CondInstallSnapshot(m.SnapshotTerm,
 				m.SnapshotIndex, m.Snapshot) {
+				fmt.Printf("%v\n", m.Snapshot)
 				cfg.logs[i] = make(map[int]interface{})
 				r := bytes.NewBuffer(m.Snapshot)
 				d := labgob.NewDecoder(r)
 				var v int
 				if d.Decode(&v) != nil {
+					fmt.Printf("%v\n", m.Snapshot)
 					log.Fatalf("decode error\n")
 				}
 				cfg.logs[i][m.SnapshotIndex] = v
@@ -542,6 +545,7 @@ func (cfg *config) one(cmd interface{}, expectedServers int, retry bool) int {
 			time.Sleep(50 * time.Millisecond)
 		}
 	}
+	fmt.Printf("%v %v", cfg.logs, cmd)
 	cfg.t.Fatalf("one(%v) failed to reach agreement", cmd)
 	return -1
 }
